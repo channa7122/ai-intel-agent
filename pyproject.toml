@@ -9,4 +9,5 @@ dependencies = [
     "feedparser>=6.0.11",   # parses RSS/Atom feeds (arXiv, blogs, news outlets)
     "requests>=2.32.3",     # HTTP calls to APIs (GitHub, HN, GDELT)
     "python-dotenv>=1.0.1", # loads config/.env into environment variables
+    "groq>=1.7.0",
 ]
