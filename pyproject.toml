@@ -11,4 +11,5 @@ dependencies = [
     "python-dotenv>=1.0.1", # loads config/.env into environment variables
     "groq>=1.7.0",
     "chromadb>=1.5.9",
+    "discord-py>=2.7.1",
 ]
