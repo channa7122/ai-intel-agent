@@ -1,2 +1,0 @@
-# Filled in progressively as each phase needs new libraries.
-# Phase 1 will likely add: feedparser, requests, python-dotenv
