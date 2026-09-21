@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Intel Hub — Autonomous Intelligence Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blurple: '#5865F2',
+              emerald: '#2ECC71',
+              dark: '#0f172a',
+              card: '#1e293b',
+              border: '#334155'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen antialiased flex flex-col">
+
+  <!-- Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🤖</span>
+        <div>
+          <h1 class="font-bold text-lg text-slate-50 tracking-tight">AI INTEL HUB</h1>
+          <p class="text-xs text-slate-400">Autonomous Tech & World Intelligence Pipeline</p>
+        </div>
+      </div>
+
+      <!-- Semantic Search Bar -->
+      <form action="/" method="GET" class="w-full md:w-96 flex items-center relative">
+        <input 
+          type="text" 
+          name="q" 
+          value="{{ search_query or '' }}" 
+          placeholder="Semantic search (e.g. 'inference speedup', 'Geneva')..."
+          class="w-full bg-slate-800/80 border border-slate-700 rounded-lg px-3.5 py-1.5 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-brand-blurple focus:ring-1 focus:ring-brand-blurple transition"
+        >
+        {% if search_query %}
+          <a href="/" class="absolute right-12 text-xs text-slate-400 hover:text-slate-200">Clear</a>
+        {% endif %}
+        <button type="submit" class="absolute right-2 text-slate-400 hover:text-slate-200 p-1 text-xs">
+          🔍
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full">
+    
+    <!-- Metrics Bar -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5">
+        <p class="text-xs text-slate-400">Total Stories Indexed</p>
+        <p class="text-2xl font-bold text-slate-50 mt-0.5">{{ stats.total }}</p>
+      </div>
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5">
+        <p class="text-xs text-indigo-400">Tech & AI Research</p>
+        <p class="text-2xl font-bold text-indigo-300 mt-0.5">{{ stats.tech }}</p>
+      </div>
+      <div class="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3.5">
+        <p class="text-xs text-emerald-400">Global Briefings</p>
+        <p class="text-2xl font-bold text-emerald-300 mt-0.5">{{ stats.world }}</p>
+      </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-6">
+      <div class="flex gap-2">
+        <a href="/?cat=" class="px-3 py-1 rounded-md text-xs font-medium transition {% if not current_cat %} bg-slate-700 text-white {% else %} text-slate-400 hover:text-slate-200 hover:bg-slate-800 {% endif %}">
+          All Stories
+        </a>
+        <a href="/?cat=tech" class="px-3 py-1 rounded-md text-xs font-medium transition {% if current_cat == 'tech' %} bg-indigo-600 text-white {% else %} text-slate-400 hover:text-slate-200 hover:bg-slate-800 {% endif %}">
+          Tech & AI
+        </a>
+        <a href="/?cat=world" class="px-3 py-1 rounded-md text-xs font-medium transition {% if current_cat == 'world' %} bg-emerald-600 text-white {% else %} text-slate-400 hover:text-slate-200 hover:bg-slate-800 {% endif %}">
+          Global News
+        </a>
+      </div>
+      <div class="text-xs text-slate-400">
+        Showing {{ stories|length }} stories {% if search_query %}for <span class="text-slate-200 font-medium">"{{ search_query }}"</span>{% endif %}
+      </div>
+    </div>
+
+    <!-- Stories List -->
+    {% if not stories %}
+      <div class="text-center py-16 bg-slate-800/20 border border-dashed border-slate-800 rounded-2xl">
+        <p class="text-slate-400 text-sm">No stories found matching your criteria.</p>
+        <a href="/" class="mt-2 inline-block text-xs text-brand-blurple hover:underline">Reset search</a>
+      </div>
+    {% else %}
+      <div class="space-y-4">
+        {% for s in stories %}
+          <article class="bg-slate-800/70 border border-slate-700/70 hover:border-slate-600 rounded-xl p-5 transition shadow-sm">
+            
+            <!-- Card Header -->
+            <div class="flex items-start justify-between gap-4 mb-2">
+              <div class="flex items-center gap-2">
+                {% if s.category == 'tech' %}
+                  <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[11px] font-semibold px-2 py-0.5 rounded">
+                    TECH & AI
+                  </span>
+                {% else %}
+                  <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[11px] font-semibold px-2 py-0.5 rounded">
+                    GLOBAL BRIEF
+                  </span>
+                {% endif %}
+                <span class="text-xs text-slate-400 font-mono">[{{ s.source }}]</span>
+              </div>
+              <span class="text-[11px] text-slate-400 font-mono">ID: {{ s.id }}</span>
+            </div>
+
+            <!-- Title -->
+            <h2 class="text-base font-semibold text-slate-50 hover:text-indigo-300 transition mb-3">
+              <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">
+                {{ s.title }} ↗
+              </a>
+            </h2>
+
+            <!-- TL;DR -->
+            <div class="mb-3.5 bg-slate-900/60 p-3 rounded-lg border border-slate-800/80">
+              <h3 class="text-xs font-bold text-slate-300 mb-1 flex items-center gap-1.5">
+                <span>📌</span> Summary (TL;DR)
+              </h3>
+              <p class="text-xs text-slate-300 leading-relaxed">{{ s.tldr or s.raw_summary }}</p>
+            </div>
+
+            <!-- Impact & Facts Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              
+              <!-- Impact -->
+              <div class="bg-slate-900/40 p-3 rounded-lg border border-slate-800/60">
+                <h3 class="font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  {% if s.category == 'tech' %}
+                    <span class="text-amber-400">⚡</span> Developer & Architecture Impact
+                  {% else %}
+                    <span class="text-emerald-400">🌐</span> Global Significance
+                  {% endif %}
+                </h3>
+                <div class="text-slate-300 space-y-1 leading-relaxed whitespace-pre-line">{{ s.dev_impact_notes }}</div>
+              </div>
+
+              <!-- Facts -->
+              <div class="bg-slate-900/40 p-3 rounded-lg border border-slate-800/60">
+                <h3 class="font-bold text-slate-300 mb-1.5 flex items-center gap-1.5">
+                  <span>🔍</span> Verified Key Claims
+                </h3>
+                <ul class="list-disc list-inside text-slate-300 space-y-0.5">
+                  {% for fact in s.verified_facts %}
+                    <li>{{ fact }}</li>
+                  {% else %}
+                    <li class="text-slate-400">No verified facts available.</li>
+                  {% endfor %}
+                </ul>
+              </div>
+
+            </div>
+
+            <!-- Footer Links -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+              <div>
+                {% if s.primary_source_url and s.primary_source_url != s.url %}
+                  <span>Primary: </span>
+                  <a href="{{ s.primary_source_url }}" target="_blank" class="text-indigo-400 hover:underline">
+                    {{ s.primary_source_url[:60] }}...
+                  </a>
+                {% endif %}
+              </div>
+              <div>
+                Published: {{ s.published_at.strftime('%Y-%m-%d %H:%M UTC') if s.published_at else 'Recent' }}
+              </div>
+            </div>
+
+          </article>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  </main>
+
+  <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-400">
+    AI Intel Agent • Automated Pipeline with Groq & ChromaDB Vector RAG
+  </footer>
+
+</body>
+</html>
