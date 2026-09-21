@@ -5,18 +5,17 @@ Handles interactive user questions in Discord threads using ChromaDB RAG and Gro
 
 import discord
 from groq import Groq
-from config.settings import GROQ_API_KEY
 from storage.vector_store import search_similar
 
-RAG_SYSTEM_PROMPT = """You are the AI Intelligence Bot, an expert research assistant for software engineers and tech analysts.
+RAG_SYSTEM_PROMPT = """You are the AI Intelligence Bot, an expert research assistant for software engineers.
 The user is asking a question in a Discord thread about a recent news item.
 You are provided with retrieved context from our verified intelligence database.
 
 Rules:
 1. Ground your answer strictly in the provided Context.
-2. If the user asks for code, benchmarks, or architectural explanations, provide concise, high-value technical answers.
-3. If the context does not contain enough info to answer fully, state what is known from the context and offer reasonable engineering context without fabricating facts.
-4. Keep the response concise, formatted in clean Markdown suitable for a Discord message (bullet points, bold highlights, code blocks).
+2. If the context lacks specific details, state what is known from the context and provide concise, relevant engineering context without fabricating facts.
+3. Keep the entire response under 250 words so it fits within Discord message limits.
+4. Format in clean, readable Markdown (bullet points, bold highlights, code blocks).
 """
 
 
@@ -59,14 +58,10 @@ def generate_rag_response(user_query: str, client: Groq, model: str = "openai/gp
 
 
 async def handle_thread_reply(message: discord.Message, client: Groq):
-    """
-    Processes an incoming user message inside a thread or mention.
-    """
-    # Ignore messages sent by the bot itself
+    """Processes an incoming user message inside a thread or mention."""
     if message.author.bot:
         return
 
-    # Trigger typing indicator while Groq + ChromaDB generate the answer
     async with message.channel.typing():
         user_query = message.clean_content
 
@@ -76,7 +71,6 @@ async def handle_thread_reply(message: discord.Message, client: Groq):
 
         answer = generate_rag_response(user_query, client=client)
 
-        # Discord message limit safeguard (2000 chars)
         if len(answer) > 1950:
             answer = answer[:1950] + "\n\n*(Truncated due to Discord character limit)*"
 
